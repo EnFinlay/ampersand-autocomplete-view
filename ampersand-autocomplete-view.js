@@ -18,6 +18,7 @@
  */
 
 var View = require('ampersand-view');
+var Css = require('./css/autocomplete.css');
 
 var ItemView = View.extend({
   autoRender: true,
@@ -37,7 +38,7 @@ var ItemView = View.extend({
   },
   activateItem: function() {
     this.parent.activateModel(this.model);
-  },
+  }
 });
 
 module.exports = View.extend({
@@ -57,12 +58,14 @@ module.exports = View.extend({
       selector: 'input',
       name: 'name'
     },
-    'label': [{
-      hook: 'label'
-    },{
-      type: 'toggle',
-      hook: 'label'
-    }
+    'label': [
+      {
+        hook: 'label'
+      },
+      {
+        type: 'toggle',
+        hook: 'label'
+      }
     ],
     'message': {
       type: 'text',
@@ -179,7 +182,7 @@ module.exports = View.extend({
     this.menu = this.query('ul');
   },
   // Called by searchInput and whenever models change
-  rerender: function(models) {
+  rerender: function (models) {
     this.menu.innerHTML = null;
     models.forEach(this.renderModel, this);
     if (models.length) {
@@ -188,22 +191,17 @@ module.exports = View.extend({
       this.hide();
     }
   },
-  renderModel: function(model) {
-
+  renderModel: function (model) {
     var li = document.createElement('li');
-
     this.renderSubview(new ItemView({model: model, parent: this}), li);
-   // var view = new this.view({model: model}).render().el;
-
-   // li.appendChild(view);
     this.menu.appendChild(li);
   },
   // Return the models with a key that matches a portion of the given value
-  search: function(value) {
+  search: function (value) {
     // Use a regex to quickly perform a case-insensitive match
     var re = new RegExp(value, 'i');
     var key = this.idAttribute;
-    return this.options.filter(function(model) {
+    return this.options.filter(function (model) {
       return re.test(model.get(key));
     });
   },
@@ -215,21 +213,22 @@ module.exports = View.extend({
     this.input.value = '';
   },
   // Convenience method for clearing the search input
-  clearInput: function() {
+  clearInput: function () {
     this.input.value = '';
   },
   // Pull the value from the search input and re-render the matched models
-  searchInput: function() {
+  searchInput: function () {
     // TODO it'd be nice to limit the results during array iteration
     this.results = this.search(this.input.value).slice(0, this.options.limit);
     this.rerender(this.results);
   },
-  select: function() {
-    // TODO This may go wrong with different templates
-    var index = this.menu.find('.active').index();
-    this.selectModel(this.results[index]);
+  select: function () {
+    var index = Array.prototype.indexOf.call(this.menu.childNodes, this.find(this.menu, '.active')[0]);
+    if (index > -1) {
+      this.selectModel(this.results[index]);
+    }
   },
-  selectModel: function(model) {
+  selectModel: function (model) {
     // Update the input field with the key attribute of the select model
     var key = this.idAttribute;
     this.input.value = model.get(key);
@@ -240,13 +239,15 @@ module.exports = View.extend({
     // Empty the results
     this.results = [];
   },
-  activateModel: function(model) {
-    console.log(model);
-    this.menu.find('.active').removeClass('active');
+  activateModel: function (model) {
+    var el = this.find(this.menu, 'active');
+    if (el && el.length) {
+      this.removeClass(el, 'active');
+    }
   },
   // Misc. events
-  keyup: function(evt) {
-    switch(evt.keyCode) {
+  keyup: function (evt) {
+    switch (evt.keyCode) {
       case 40: // Down arrow
       case 38: // Up arrow
       case 16: // Shift
@@ -276,33 +277,33 @@ module.exports = View.extend({
     evt.preventDefault();
   },
   // Menu state
-  focus: function() {
+  focus: function () {
     this.focused = true;
     // TODO Only show the menu if no item has been selected
     if (!this.shown) {
       this.show();
     }
   },
-  blur: function() {
+  blur: function () {
     this.focused = false;
     if (!this.mousedover && this.shown) this.hide();
   },
-  mouseenter: function() {
+  mouseenter: function () {
     this.mousedover = true;
     // TODO Re-add 'active' class to the current target
   },
-  mouseleave: function() {
+  mouseleave: function () {
     this.mousedover = false;
     if (!this.focused && this.shown) this.hide();
   },
   // Allow the user to change their selection with the keyboard
-  keydown: function(evt) {
+  keydown: function (evt) {
     // TODO I still hate this array check
-    var keycodes = [40,38,9,13,27];
+    var keycodes = [40, 38, 9, 13, 27];
     this.suppressKeyPressRepeat = keycodes.indexOf(evt.keyCode) !== -1;
     this.move(evt);
   },
-  keypress: function(evt) {
+  keypress: function (evt) {
     // The suppressKeyPressRepeat check exists because keydown and keypress
     // may fire for the same event
     if (this.suppressKeyPressRepeat) {
@@ -310,11 +311,11 @@ module.exports = View.extend({
     }
     this.move(evt);
   },
-  move: function(evt) {
+  move: function (evt) {
     if (!this.shown) {
       return;
     }
-    switch(evt.keyCode) {
+    switch (evt.keyCode) {
       case 9: // Tab
       case 13: // Enter
       case 27: // Escape
@@ -331,40 +332,61 @@ module.exports = View.extend({
     }
     evt.stopPropagation();
   },
-  prevItem: function() {
-    // TODO should there be signals for prev and next?
-    var active = this.menu.find('.active').removeClass('active');
-    var prev = active.prev();
-    if (!prev.length) prev = this.menu.find('li').last();
-    prev.addClass('active');
+  prevItem: function () {
+    var active = this.find(this.menu, '.active')[0];
+    if (active) {
+      this.removeClass(active, 'active');
+    }
+    var prev = active ? active.previousElementSibling : null;
+    if (!prev) {
+      var nodes = this.find(this.menu, 'li');
+      prev = nodes[nodes.length-1];
+    }
+    this.addClass(prev, 'active');
   },
-  nextItem: function() {
-    var active = this.menu.find('.active').removeClass('active');
-    var next = active.next();
-    if (!next.length) next = this.menu.find('li').first();
-    next.addClass('active');
+  nextItem: function () {
+    var active = this.find(this.menu, '.active')[0];
+    if (active) {
+      this.removeClass(active, 'active');
+    }
+    var next = active ? active.nextElementSibling : null;
+    if (!next) {
+      next = this.find(this.menu, 'li')[0];
+    }
+    this.addClass(next, 'active');
   },
   // Show or hide the menu depending on the typeahead's state
-  show: function() {
+  show: function () {
     // DO not show if there are no results
     if (!this.results.length) return;
-    /*var pos = $.extend(
-        {},
-        this.$input.position(),
-        // Calling the [0] index returns the vanilla HTML object
-        {height: this.$input[0].offsetHeight}
-    ); */
     var pos = this.input.style;
-    this.menu.style.top = pos.top + pos.height + this.input.offsetHeight;
-    this.menu.style.left = pos.left;
+    this.menu.style.top = pos.top + (this.input.offsetHeight + this.input.offsetHeight);
+    this.menu.style.left = pos.left + this.input.offsetLeft;
     this.menu.style.display = 'block';
     this.shown = true;
     return this;
   },
-  hide: function() {
+  hide: function () {
     this.menu.style.display = 'none';
     this.shown = false;
     return this;
+  },
+  find: function (el, selector) {
+    return el.querySelectorAll(selector);
+  },
+  removeClass: function (el, className) {
+    if (el.classList) {
+      el.classList.remove(className);
+    } else {
+      el.className = el.className.replace(new RegExp('(^|\\b)' + className.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
+    }
+  },
+  addClass: function (el, className) {
+    if (el.classList) {
+      el.classList.add(className);
+    } else {
+      el.className += ' ' + className;
+    }
   },
   runTests: function () {
     return;

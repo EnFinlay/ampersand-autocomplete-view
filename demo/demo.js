@@ -16,7 +16,8 @@ var Collection = require('ampersand-collection').extend({
 var collection = new Collection([
   { id: 'red', title: 'Red' },
   { id: 'yellow', title: 'Yellow' },
-  { id: 'blue', title: 'Blue' }
+  { id: 'blue', title: 'Blue' },
+  { id: 'rat', title: 'Rat' }
 ]);
 
 

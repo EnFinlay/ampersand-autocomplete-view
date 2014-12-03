@@ -33,7 +33,13 @@
     "tape": "^2.13.3",
     "tape-run": "^0.1.1",
     "tape-suite": "^0.2.0",
-    "beefy": "^2.1.1"
+    "beefy": "^2.1.1",
+    "browserify-css": "^0.2.0"
+  },
+  "browserify": {
+    "transform": [
+      "browserify-css"
+    ]
   },
   "homepage": "https://github.com/Retsly/ampersand-autocomplete-view",
   "keywords": [
@@ -49,7 +55,6 @@
   },
   "scripts": {
     "start": "run-browser test/index.js",
-   
     "demo": "beefy demo/demo.js:demo.js --cwd demo"
   }
 }
