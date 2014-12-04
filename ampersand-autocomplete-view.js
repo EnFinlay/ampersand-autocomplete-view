@@ -360,7 +360,7 @@ module.exports = View.extend({
     // DO not show if there are no results
     if (!this.results.length) return;
     var pos = this.input.style;
-    this.menu.style.top = pos.top + (this.input.offsetHeight + this.input.offsetHeight);
+    this.menu.style.top = pos.top + (this.input.offsetHeight + this.input.offsetTop);
     this.menu.style.left = pos.left + this.input.offsetLeft;
     this.menu.style.display = 'block';
     this.shown = true;
