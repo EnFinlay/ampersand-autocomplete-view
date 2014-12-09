@@ -23,6 +23,7 @@
     "ampersand-form-view": "^0.2.2",
     "ampersand-state": "^4.2.3",
     "ampersand-view-conventions": "^1.1.1",
+    "ampersand-rest-collection": "^2.0.4",
     "browserify": "^5.10.1",
     "function-bind": "^0.1.0",
     "jshint": "^2.5.1",

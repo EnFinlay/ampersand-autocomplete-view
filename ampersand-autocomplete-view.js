@@ -2,6 +2,7 @@
  *  - name:       name of the field
  *  - parent:     parent form reference
  *  - options:    array/collection of options to render into the select box
+ *  - url:        url providing
  *  - [unselectedText]: text to display if unselected
  *  - [value]:    initial value for the field
  *  - [el]:       dom node to use for the view
@@ -149,11 +150,16 @@ module.exports = View.extend({
       throw new Error('SelectView requires select options.');
     }
     this.options = opts.options;
+    this.url = opts.url;
 
     if (this.options.isCollection) {
       this.idAttribute = opts.idAttribute || this.options.mainIndex || 'id';
       this.textAttribute = opts.textAttribute || 'text';
+      this.queryKey = opts.queryKey;
     }
+
+    this.maxResults = opts.maxResults || 10;
+    this.minKeywordLength = opts.minKeywordLength || 1;
 
     this.el = opts.el;
     this.value = opts.value;
@@ -197,13 +203,26 @@ module.exports = View.extend({
     this.menu.appendChild(li);
   },
   // Return the models with a key that matches a portion of the given value
-  search: function (value) {
-    // Use a regex to quickly perform a case-insensitive match
-    var re = new RegExp(value, 'i');
-    var key = this.idAttribute;
-    return this.options.filter(function (model) {
-      return re.test(model.get(key));
-    });
+  search: function (value, callback) {
+    if (this.options.url) {
+      var queryKey = this.queryKey;
+      var parameters = {};
+      parameters[queryKey] = value;
+      this.options.reset();
+      this.options.fetch({
+        success: function (collection, response, options) {
+          callback(collection);
+        }.bind(this),
+        data: parameters
+      });
+    } else {
+      // Use a regex to quickly perform a case-insensitive match
+      var re = new RegExp(value, 'i');
+      var key = this.idAttribute;
+      callback(this.options.filter(function (model) {
+        return re.test(model.get(key));
+      }));
+    }
   },
   handleInputChanged: function () {
     if (document.activeElement === this.input) {
@@ -212,20 +231,25 @@ module.exports = View.extend({
     //this.inputValue = this.clean(this.input.value);
     this.input.value = '';
   },
-  // Convenience method for clearing the search input
-  clearInput: function () {
-    this.input.value = '';
-  },
   // Pull the value from the search input and re-render the matched models
   searchInput: function () {
-    // TODO it'd be nice to limit the results during array iteration
-    this.results = this.search(this.input.value).slice(0, this.options.limit);
-    this.rerender(this.results);
+    var self = this;
+    if (this.input.value.length < this.minKeywordLength) {
+      this.results = [];
+      this.menu.innerHTML = null;
+      this.hide();
+      return;
+    }
+    this.search(this.input.value, function(results) {
+      self.results = results;
+      self.results.models = self.results.models.slice(0, self.maxResults);
+      self.rerender(self.results);
+    });
   },
   select: function () {
     var index = Array.prototype.indexOf.call(this.menu.childNodes, this.find(this.menu, '.active')[0]);
     if (index > -1) {
-      this.selectModel(this.results[index]);
+      this.selectModel(this.results.models[index]);
     }
   },
   selectModel: function (model) {
