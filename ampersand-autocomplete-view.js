@@ -23,9 +23,14 @@ var Css = require('./css/autocomplete.css');
 
 var ItemView = View.extend({
   autoRender: true,
-  template: ['<a data-hook="id"></a>'].join(''),
+  template: ['<a data-hook="id"><span data-hook="name"></span></a>'].join(''),
   bindings: {
-    'model.id': '[data-hook=id]'
+    'model.id': {
+      type: 'attribute',
+      name: 'id',
+      hook: 'id'
+    },
+    'model.name': '[data-hook=name]'
   },
   events: {
     'click': 'selectItem',
@@ -54,6 +59,11 @@ module.exports = View.extend({
     '</label>'
   ].join(''),
   bindings: {
+    'placeHolder': {
+      type: 'attribute',
+      selector: 'input',
+      name: 'placeholder'
+    },
     'name': {
       type: 'attribute',
       selector: 'input',
@@ -90,6 +100,7 @@ module.exports = View.extend({
     startingValue: 'any',
     options: 'any',
     name: 'string',
+    placeholder: 'string',
     label: ['string', true, ''],
     required: ['boolean', true, true],
     shouldValidate: ['boolean', true, false],
@@ -142,12 +153,11 @@ module.exports = View.extend({
     opts = opts || {};
 
     if (typeof opts.name !== 'string') {
-      throw new Error('SelectView requires a name property.');
+      throw new Error('AutoComplete requires a name property.');
     }
-    this.name = opts.name;
 
     if (!Array.isArray(opts.options) && !opts.options.isCollection) {
-      throw new Error('SelectView requires select options.');
+      throw new Error('AutoComplete requires select options.');
     }
     this.options = opts.options;
     this.url = opts.url;
@@ -162,9 +172,11 @@ module.exports = View.extend({
     this.minKeywordLength = opts.minKeywordLength || 1;
 
     this.el = opts.el;
+    this.name = opts.name;
     this.value = opts.value;
     this.label = opts.label || this.name;
     this.parent = opts.parent || this.parent;
+    this.itemTemplate = opts.itemTemplate;
     this.template = opts.template || this.template;
     this.placeHolder = opts.placeHolder;
     this.yieldModel = (opts.yieldModel === false) ? false : true;
@@ -199,7 +211,11 @@ module.exports = View.extend({
   },
   renderModel: function (model) {
     var li = document.createElement('li');
-    this.renderSubview(new ItemView({model: model, parent: this}), li);
+    var view = new ItemView({model: model, parent: this});
+    if (this.itemTemplate) {
+      view = new ItemView({model: model, parent: this, template: this.itemTemplate });
+    }
+    this.renderSubview(view, li);
     this.menu.appendChild(li);
   },
   // Return the models with a key that matches a portion of the given value
@@ -254,7 +270,7 @@ module.exports = View.extend({
   },
   selectModel: function (model) {
     // Update the input field with the key attribute of the select model
-    var key = this.idAttribute;
+    var key = this.textAttribute;
     this.input.value = model.get(key);
     // Hide the menu
     this.hide();
@@ -415,14 +431,14 @@ module.exports = View.extend({
   runTests: function () {
     return;
     /*var message = this.getErrorMessage();
-    if (!message && this.inputValue && this.changed) {
-      // if it's ever been valid,
-      // we want to validate from now
-      // on.
-      this.shouldValidate = true;
-    }
-    this.message = message;
-    return message;*/
+     if (!message && this.inputValue && this.changed) {
+     // if it's ever been valid,
+     // we want to validate from now
+     // on.
+     this.shouldValidate = true;
+     }
+     this.message = message;
+     return message;*/
   },
   initInputBindings: function () {
     this.input.addEventListener('blur', this.blur, false);
