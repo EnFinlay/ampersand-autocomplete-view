@@ -1,7 +1,7 @@
 {
   "name": "ampersand-autocomplete-view",
   "description": "An autocomplete view module.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "Phil Jepsen <phil@rets.ly>",
   "browserify": {
     "transform": [
