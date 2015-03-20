@@ -52,7 +52,7 @@
   "main": "ampersand-autocomplete-view.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/ampersandjs/ampersand-autocomplete-view"
+    "url": "git://github.com/retsly/ampersand-autocomplete-view"
   },
   "scripts": {
     "start": "run-browser test/index.js",
