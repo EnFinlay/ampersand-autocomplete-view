@@ -4,13 +4,13 @@ ampersand-autocomplete-view
 An ampersand autocomplete view.
 
 
-##Install
+## Install
 
 ```
 npm install ampersand-autocomplete-view
 ```
 
-##Example
+## Example
 
 ```javascript
 var AutoCompleteView = require('../ampersand-autocomplete-view');
@@ -67,14 +67,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
 ```
 
-##Demo
+## Demo
 
 ```
 npm run demo
 ```
 
-##Credits
+## Credits
+
 Written by @pjepsen
 
-##License
+## License
+
 MIT
