@@ -19,7 +19,6 @@
  */
 
 var View = require('ampersand-view');
-var Css = require('./css/autocomplete.css');
 
 var ItemView = View.extend({
   autoRender: true,
