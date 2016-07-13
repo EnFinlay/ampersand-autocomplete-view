@@ -3,11 +3,6 @@
   "description": "An autocomplete view module.",
   "version": "0.0.3",
   "author": "Phil Jepsen <phil@rets.ly>",
-  "browserify": {
-    "transform": [
-      "ampersand-version"
-    ]
-  },
   "bugs": {
     "url": "https://github.com/Retsly/ampersand-autocomplete-view/issues"
   },
@@ -16,9 +11,7 @@
     "ampersand-dom": "^1.1.0",
     "ampersand-version": "^1.0.1",
     "domify": "^1.2.2",
-    "matches-selector": "^1.0.0",
-    "browserify": "^5.10.1",
-    "browserify-css": "^0.2.0"
+    "matches-selector": "^1.0.0"
   },
   "devDependencies": {
     "ampersand-form-view": "^0.2.2",
@@ -36,11 +29,6 @@
     "tape-run": "^0.1.1",
     "tape-suite": "^0.2.0",
     "beefy": "^2.1.1"
-  },
-  "browserify": {
-    "transform": [
-      "browserify-css"
-    ]
   },
   "homepage": "https://github.com/Retsly/ampersand-autocomplete-view",
   "keywords": [
