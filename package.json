@@ -1,7 +1,7 @@
 {
   "name": "ampersand-autocomplete-view",
   "description": "An autocomplete view module.",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "author": "Phil Jepsen <phil@rets.ly>",
   "bugs": {
     "url": "https://github.com/Retsly/ampersand-autocomplete-view/issues"
