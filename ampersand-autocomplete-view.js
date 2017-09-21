@@ -201,7 +201,7 @@ module.exports = View.extend({
   // Called by searchInput and whenever models change
   rerender: function (models) {
     this.menu.innerHTML = null;
-    models.forEach(this.renderModel, this);
+    models.forEach(this.renderModel.bind(this));
     if (models.length) {
       this.show();
     } else {
